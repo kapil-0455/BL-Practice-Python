@@ -1,0 +1,155 @@
+openapi: 3.2.0
+
+info:
+  title : Async web Intelligence Collector
+  description: > 
+    API contact for Project
+  version: 1.0.0
+
+paths:
+  /crawl:
+    post:
+      summary: Crawl the provided urls
+      operationId: crawlUrls
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrawlRequest'
+      responses:
+        '200':
+          description: Crawl results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CrawlResponse'
+  /health:
+    get:
+      summary: health of check collector
+      operationId: healthCheck
+
+      responses:
+        '200':
+          description: collector is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse' 
+
+  /results:
+    get:
+      summary: get all collected results
+      operationId: getResults
+
+      responses:
+        '200':
+          description: crawl results collected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultsResponse'
+
+
+components:
+
+  schemas:
+
+    CrawlRequest:
+      type: object
+      required:
+        - urls
+
+      properties:
+        urls:
+          type: array
+          description: URLs to crawl
+          minItems: 1
+          items:
+            type: string
+            format: uri
+
+
+    CrawlResponse:
+      type: object
+      required:
+        - total_urls
+        - successful
+        - failed
+        - results
+
+      properties:
+
+        total_urls:
+          type: integer
+          minimum: 0
+
+        successful:
+          type: integer
+          minimum: 0
+
+        failed:
+          type: integer
+          minimum: 0
+
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrawlResult'
+
+
+    CrawlResult:
+      type: object
+      required:
+        - url
+        - title
+        - status
+        - data
+      
+      properties:
+
+        url:
+          type: string
+          format: uri
+
+        title:
+          type: string
+
+        status:
+          type: string
+          enum:
+            - success
+            - failed
+
+        data:
+          type: object
+          additionalProperties: true
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+
+      properties:
+        status:
+          type: string
+          example: healthy
+
+
+    ResultsResponse:
+      type: object
+      required:
+        - count
+        - results
+
+      properties:
+
+        count:
+          type: integer
+          minimum: 0
+
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CrawlResult'

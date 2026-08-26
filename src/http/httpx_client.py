@@ -21,7 +21,7 @@ async def async_fetch(url: str) -> dict:
 
                 completion_time = end - start
 
-                # 2xx → success
+                # 2xx => success
                 if 200 <= response.status_code < 300:
                     return {
                         "url": url,
@@ -33,7 +33,7 @@ async def async_fetch(url: str) -> dict:
                         "error": None,
                     }
 
-                # 4xx → don't blindly retry
+                # 4xx => don't blindly retry
                 if 400 <= response.status_code < 500:
                     return {
                         "url": url,
@@ -45,7 +45,7 @@ async def async_fetch(url: str) -> dict:
                         "error": f"HTTP {response.status_code}",
                     }
 
-                # 5xx → retry
+                # 5xx => retry
                 if 500 <= response.status_code < 600:
                     if attempt < MAX_RETRIES:
                         continue
