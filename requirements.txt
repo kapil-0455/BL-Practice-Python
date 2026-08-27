@@ -2,3 +2,5 @@ requests
 httpx
 crawl4ai
 pytest
+pytest-asyncio
+pyyaml

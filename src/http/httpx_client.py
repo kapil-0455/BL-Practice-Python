@@ -7,6 +7,10 @@ DEFAULT_TIMEOUT = 10
 MAX_RETRIES = 3
 
 
+def retry_delay(attempt: int, base_delay: float = 1.0) -> float:
+    return base_delay * (2**attempt)
+
+
 async def async_fetch(url: str) -> dict:
     timeout = httpx.Timeout(DEFAULT_TIMEOUT)
 
@@ -48,6 +52,9 @@ async def async_fetch(url: str) -> dict:
                 # 5xx => retry
                 if 500 <= response.status_code < 600:
                     if attempt < MAX_RETRIES:
+                        delay = retry_delay(attempt)
+                        print(f"HTTP {response.status_code} retrying in {delay}")
+                        await asyncio.sleep(delay)
                         continue
 
                     return {
@@ -62,6 +69,9 @@ async def async_fetch(url: str) -> dict:
 
             except httpx.TimeoutException:
                 if attempt < MAX_RETRIES:
+                    delay = retry_delay(attempt)
+                    print(f"Timeout for {url} - retrying in {delay}")
+                    await asyncio.sleep(delay)
                     continue
 
                 return {
@@ -76,6 +86,9 @@ async def async_fetch(url: str) -> dict:
 
             except httpx.ConnectError:
                 if attempt < MAX_RETRIES:
+                    delay = retry_delay(attempt)
+                    print(f"Connection error for {url} - retrying in {delay}")
+                    await asyncio.sleep(delay)
                     continue
 
                 return {
@@ -89,6 +102,11 @@ async def async_fetch(url: str) -> dict:
                 }
 
             except httpx.RequestError as exc:
+                if attempt < MAX_RETRIES:
+                    delay = retry_delay(attempt)
+                    print(f"Request error for {url} - retrying in {delay}")
+                    await asyncio.sleep(delay)
+                    continue
                 return {
                     "url": url,
                     "status_code": None,
