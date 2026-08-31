@@ -11,7 +11,7 @@ POOL_TIMEOUT = 5.0
 
 MAX_RETRIES = 3
 MAX_CONCURRENT_REQUESTS = 5
-RATE_LIMIT  = 1.0
+RATE_LIMIT = 1.0
 
 
 logger = logging.getLogger(__name__)
